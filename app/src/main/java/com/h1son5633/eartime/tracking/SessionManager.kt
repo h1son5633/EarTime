@@ -37,6 +37,14 @@ class SessionManager(private val dao: SessionDao) {
         }
     }
 
+    /** Remove every session belonging to a device that is not an earphone. */
+    suspend fun purgeDevices(addresses: Set<String>) {
+        if (addresses.isEmpty()) return
+        mutex.withLock {
+            for (address in addresses) dao.deleteForAddress(address)
+        }
+    }
+
     /** Heartbeat while the service is alive. */
     suspend fun heartbeat() {
         mutex.withLock {

@@ -8,6 +8,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.bluetooth.BluetoothA2dp
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothClass
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothHeadset
 import android.bluetooth.BluetoothManager
@@ -68,7 +69,9 @@ class TrackingService : Service() {
                         BluetoothProfile.EXTRA_STATE, BluetoothProfile.STATE_DISCONNECTED
                     )
                     if (state == BluetoothProfile.STATE_CONNECTED) {
-                        scope.launch { manager.onConnected(device.safeName(), device.address) }
+                        if (device.isCountableAudioDevice()) {
+                            scope.launch { manager.onConnected(device.safeName(), device.address) }
+                        }
                     } else if (state == BluetoothProfile.STATE_DISCONNECTED) {
                         scope.launch { manager.onDisconnected(device.address) }
                     }
@@ -96,6 +99,7 @@ class TrackingService : Service() {
     override fun onCreate() {
         super.onCreate()
         manager = (application as EarTimeApp).sessionManager
+        purgeNonAudioSessions()
         startForegroundNotification()
         registerBtReceiver()
         connectProfileProxies()
@@ -162,7 +166,33 @@ class TrackingService : Service() {
         for (proxy in listOfNotNull(a2dpProxy, headsetProxy)) {
             runCatching { out.addAll(proxy.connectedDevices) }
         }
-        return out
+        return out.filter { it.isCountableAudioDevice() }.toSet()
+    }
+
+    /**
+     * False only when the device positively reports a non-audio Bluetooth
+     * class. Smartwatches (e.g. vivo WATCH GT) connect with the HEADSET
+     * profile for calls and must not be counted as earphones — they report
+     * major class WEARABLE, while earbuds/headphones report AUDIO_VIDEO.
+     * A device whose class is unknown is accepted, so an unclassifiable
+     * earphone is never silently dropped.
+     */
+    private fun BluetoothDevice.isCountableAudioDevice(): Boolean {
+        val cls = runCatching { bluetoothClass }.getOrNull() ?: return true
+        return cls.majorDeviceClass == BluetoothClass.Device.Major.AUDIO_VIDEO
+    }
+
+    /** One-time cleanup of sessions recorded for non-earphone devices. */
+    private fun purgeNonAudioSessions() {
+        if (!hasConnectPermission()) return
+        val adapter = bluetoothAdapter() ?: return
+        scope.launch {
+            val bad = runCatching { adapter.bondedDevices }.getOrNull().orEmpty()
+                .filter { !it.isCountableAudioDevice() }
+                .map { it.address }
+                .toSet()
+            manager.purgeDevices(bad)
+        }
     }
 
     private fun syncConnectedDevices(reconcile: Boolean = false) {

@@ -40,6 +40,9 @@ interface SessionDao {
     @Query("SELECT * FROM sessions WHERE endMs IS NULL AND deviceAddress = :address LIMIT 1")
     suspend fun openSessionFor(address: String): SessionEntity?
 
+    @Query("DELETE FROM sessions WHERE deviceAddress = :address")
+    suspend fun deleteForAddress(address: String)
+
     @Insert
     suspend fun insert(session: SessionEntity): Long
 
