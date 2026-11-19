@@ -34,6 +34,7 @@ import com.h1son5633.eartime.data.SessionEntity
 import com.h1son5633.eartime.data.Stats
 import com.h1son5633.eartime.data.formatDuration
 import com.h1son5633.eartime.data.periodData
+import com.h1son5633.eartime.data.toDate
 import com.h1son5633.eartime.data.toLabel
 import com.h1son5633.eartime.data.toTimeLabel
 import java.time.LocalDate
