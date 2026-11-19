@@ -70,7 +70,7 @@ fun StatsScreen(sessions: List<SessionEntity>) {
             RecordCard(Modifier.weight(1f), "单次佩戴最长",
                 longestSession?.let { formatDuration(it.durationMs(now)) } ?: "0min",
                 longestSession?.let {
-                    "${it.startMs.toLabel()} ${it.startMs.toTimeLabel()} – ${it.effectiveEnd(now).toTimeLabel()}"
+                    "${it.startMs.toDate().toLabel()} ${it.startMs.toTimeLabel()} – ${it.effectiveEnd(now).toTimeLabel()}"
                 } ?: "暂无记录")
         }
         Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
