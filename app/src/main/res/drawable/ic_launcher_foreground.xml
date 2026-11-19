@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- headband -->
+    <path
+        android:pathData="M30,66 L30,52 a24,24 0 0,1 48,0 L78,66"
+        android:strokeColor="#BDD7F5"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- left pad -->
+    <path
+        android:pathData="M24,60 h12 a4,4 0 0,1 4,4 v14 a4,4 0 0,1 -4,4 h-12 a4,4 0 0,1 -4,-4 v-14 a4,4 0 0,1 4,-4 z"
+        android:fillColor="#7FB2E8" />
+    <!-- right pad -->
+    <path
+        android:pathData="M72,60 h12 a4,4 0 0,1 4,4 v14 a4,4 0 0,1 -4,4 h-12 a4,4 0 0,1 -4,-4 v-14 a4,4 0 0,1 4,-4 z"
+        android:fillColor="#7FB2E8" />
+</vector>
